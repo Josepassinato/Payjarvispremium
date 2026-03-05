@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AnchorRecord {
+  id          String   @id @default(uuid())
+  merkleRoot  String   @unique
+  periodStart DateTime
+  periodEnd   DateTime
+  periodSalt  String
+  eventCount  Int
+  chainId     Int
+  txHash      String?
+  blockNumber Int?
+  status      String   @default("pending") // pending | confirmed | failed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("anchor_records")
+}
+
+model VerifiedAgent {
+  id            String   @id @default(uuid())
+  botId         String   @unique
+  agentPublicId String   @unique
+  metadataHash  String
+  onChainTxHash String?
+  active        Boolean  @default(true)
+  revokedAt     DateTime?
+  revokeReason  String?
+  certifiedAt   DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  credentials   AgentCredential[]
+
+  @@map("verified_agents")
+}
+
+model AgentCredential {
+  id            String   @id @default(uuid())
+  agentId       String
+  agent         VerifiedAgent @relation(fields: [agentId], references: [id])
+  credentialId  String   @unique
+  credential    Json
+  issuedAt      DateTime @default(now())
+  expiresAt     DateTime
+  revoked       Boolean  @default(false)
+
+  @@map("agent_credentials")
+}

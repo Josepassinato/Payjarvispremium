@@ -1,0 +1,23 @@
+{
+  "name": "payjarvis-enterprise",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PayJarvis Enterprise — Anomaly Detection, Domain Scores, Audit Reports",
+  "scripts": {
+    "dev": "tsx watch src/api/server.ts",
+    "build": "tsc",
+    "start": "node dist/api/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fastify": "^4.26.0",
+    "pdfkit": "^0.14.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/pdfkit": "^0.13.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

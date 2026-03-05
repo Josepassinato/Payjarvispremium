@@ -1,0 +1,3 @@
+// This is a symlink reference to the main prisma schema.
+// The canonical schema lives at /prisma/schema.prisma
+// Run `prisma generate` and `prisma migrate` from the project root.
