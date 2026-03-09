@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Increase Team — Configure sua empresa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:#07090F; --navy2:#0D1220; --navy3:#131929;
+  --gold:#C9A84C; --gold2:#E8C96A; --white:#F4F1EB;
+  --muted:#6B7280; --border:rgba(201,168,76,0.15);
+  --green:#4CAF82; --red:#E05A5A;
+}
+html,body { min-height:100%; background:var(--navy); color:var(--white); font-family:'DM Sans',sans-serif; }
+
+.topbar {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 40px; background:rgba(7,9,15,0.92);
+  border-bottom:1px solid var(--border); backdrop-filter:blur(12px);
+}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-mark { width:28px; height:28px; background:var(--gold); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); }
+.logo-text { font-family:'Playfair Display',serif; font-size:17px; }
+.logo-text span { color:var(--gold); }
+.topbar-right { font-size:13px; color:var(--muted); }
+.topbar-right strong { color:var(--white); }
+
+.progress-wrap {
+  position:fixed; top:57px; left:0; right:0; z-index:99;
+  background:var(--navy2); border-bottom:1px solid var(--border); padding:0 40px;
+}
+.progress-steps { display:flex; max-width:800px; margin:0 auto; }
+.step-item {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  padding:14px 8px; position:relative; cursor:default;
+}
+.step-item::after {
+  content:''; position:absolute; top:22px; left:55%; right:-5%;
+  height:2px; background:var(--border); transition:background 0.4s;
+}
+.step-item:last-child::after { display:none; }
+.step-item.done::after { background:var(--gold); }
+.step-dot {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:600; border:2px solid var(--border);
+  background:var(--navy2); color:var(--muted); transition:all 0.3s;
+  margin-bottom:6px; position:relative; z-index:1;
+}
+.step-item.active .step-dot { border-color:var(--gold); background:var(--gold); color:var(--navy); }
+.step-item.done .step-dot   { border-color:var(--green); background:var(--green); color:var(--navy); }
+.step-label { font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); transition:color 0.3s; }
+.step-item.active .step-label { color:var(--gold); }
+.step-item.done .step-label   { color:var(--green); }
+
+.main { max-width:700px; margin:0 auto; padding:160px 24px 80px; }
+
+.screen { display:none; animation:fadeUp 0.5s ease; }
+.screen.active { display:block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+.screen-header { margin-bottom:40px; }
+.step-num { font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+.screen-header h2 { font-family:'Playfair Display',serif; font-size:clamp(28px,3vw,40px); line-height:1.2; margin-bottom:12px; }
+.screen-header h2 em { font-style:italic; color:var(--gold); }
+.screen-header p { font-size:15px; color:var(--muted); line-height:1.7; max-width:520px; }
+
+.field { margin-bottom:20px; }
+.field label { display:block; font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:rgba(244,241,235,0.45); margin-bottom:8px; }
+.field input, .field select, .field textarea {
+  width:100%; padding:13px 16px; background:var(--navy2);
+  border:1px solid var(--border); border-radius:8px;
+  font-family:'DM Sans',sans-serif; font-size:14px; color:var(--white);
+  outline:none; transition:all 0.2s; appearance:none;
+}
+.field select { cursor:pointer; }
+.field textarea { resize:vertical; min-height:90px; }
+.field input::placeholder, .field textarea::placeholder { color:rgba(107,114,128,0.5); }
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--gold); background:rgba(201,168,76,0.04);
+  box-shadow:0 0 0 3px rgba(201,168,76,0.07);
+}
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+.option-grid { display:grid; gap:12px; }
+.option-grid.cols2 { grid-template-columns:1fr 1fr; }
+.option-grid.cols3 { grid-template-columns:repeat(3,1fr); }
+.opt-card {
+  padding:16px 18px; background:var(--navy2); border:2px solid var(--border);
+  border-radius:10px; cursor:pointer; transition:all 0.2s; position:relative;
+}
+.opt-card:hover { border-color:rgba(201,168,76,0.4); background:rgba(201,168,76,0.04); }
+.opt-card.selected { border-color:var(--gold); background:rgba(201,168,76,0.08); }
+.opt-card.selected::after { content:'✓'; position:absolute; top:10px; right:12px; font-size:12px; font-weight:700; color:var(--gold); }
+.opt-icon { font-size:22px; margin-bottom:6px; }
+.opt-title { font-size:13px; font-weight:600; color:var(--white); margin-bottom:2px; }
+.opt-desc  { font-size:11px; color:var(--muted); line-height:1.4; }
+
+.canal-wrap { background:var(--navy2); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.canal-header { padding:20px 24px 0; font-size:13px; color:var(--muted); }
+.canal-options { display:flex; gap:0; padding:16px; }
+.canal-btn {
+  flex:1; padding:16px 12px; background:var(--navy3); border:2px solid transparent;
+  border-radius:8px; cursor:pointer; text-align:center; transition:all 0.2s;
+  font-family:'DM Sans',sans-serif; margin:0 6px;
+}
+.canal-btn:first-child { margin-left:0; }
+.canal-btn:last-child  { margin-right:0; }
+.canal-btn:hover { border-color:rgba(201,168,76,0.3); }
+.canal-btn.active { border-color:var(--gold); background:rgba(201,168,76,0.07); }
+.canal-icon { font-size:26px; margin-bottom:6px; }
+.canal-name { font-size:13px; font-weight:600; color:var(--white); }
+.canal-desc { font-size:11px; color:var(--muted); margin-top:3px; }
+.canal-input-wrap { padding:0 16px 20px; display:none; }
+.canal-input-wrap.show { display:block; animation:fadeUp 0.3s ease; }
+
+.nav-row {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:40px; padding-top:24px; border-top:1px solid var(--border);
+}
+.btn-back {
+  padding:12px 24px; background:transparent; border:1px solid var(--border);
+  border-radius:8px; color:var(--muted); font-family:'DM Sans',sans-serif;
+  font-size:14px; cursor:pointer; transition:all 0.2s;
+}
+.btn-back:hover { border-color:rgba(244,241,235,0.3); color:var(--white); }
+.btn-back:disabled { opacity:0.3; cursor:default; }
+.btn-next {
+  padding:13px 32px; background:var(--gold); border:none; border-radius:8px;
+  color:var(--navy); font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700;
+  cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px;
+}
+.btn-next:hover { background:var(--gold2); }
+.btn-next:disabled { opacity:0.4; cursor:not-allowed; }
+.btn-next .spinner {
+  display:none; width:16px; height:16px; border:2px solid var(--navy);
+  border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite;
+}
+.btn-next.loading .spinner { display:block; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.success-screen { text-align:center; padding:40px 0; display:none; animation:fadeUp 0.6s ease; }
+.success-screen.active { display:block; }
+.success-icon {
+  width:80px; height:80px; border-radius:50%;
+  background:rgba(76,175,130,0.15); border:2px solid var(--green);
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; margin:0 auto 28px; animation:pop 0.5s ease;
+}
+@keyframes pop { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+.success-screen h2 { font-family:'Playfair Display',serif; font-size:36px; margin-bottom:12px; }
+.success-screen h2 em { color:var(--gold); font-style:italic; }
+.success-screen p { color:var(--muted); font-size:15px; max-width:460px; margin:0 auto 32px; line-height:1.7; }
+.agents-grid { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:40px; }
+.agent-badge {
+  display:flex; align-items:center; gap:8px; padding:8px 16px;
+  background:rgba(201,168,76,0.08); border:1px solid var(--border);
+  border-radius:100px; font-size:13px; color:var(--white); animation:fadeUp 0.4s ease both;
+}
+.agent-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--green); }
+.btn-dashboard {
+  padding:15px 48px; background:var(--gold); border:none; border-radius:10px;
+  color:var(--navy); font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700;
+  cursor:pointer; transition:all 0.2s;
+}
+.btn-dashboard:hover { background:var(--gold2); transform:translateY(-1px); }
+
+.toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
+  background:var(--red); color:white; padding:12px 24px; border-radius:8px;
+  font-size:14px; font-weight:500; transition:transform 0.3s; z-index:999;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.ok   { background:var(--green); }
+
+@media(max-width:640px) {
+  .topbar { padding:14px 20px; }
+  .progress-wrap { padding:0 16px; }
+  .main { padding:150px 16px 60px; }
+  .field-row { grid-template-columns:1fr; }
+  .option-grid.cols2 { grid-template-columns:1fr; }
+  .option-grid.cols3 { grid-template-columns:1fr 1fr; }
+  .step-label { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark"></div>
+    <div class="logo-text">Increase <span>Team</span></div>
+  </div>
+  <div class="topbar-right">Olá, <strong id="nome-usuario">...</strong></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-steps">
+    <div class="step-item active" id="step-ind-1"><div class="step-dot">1</div><div class="step-label">Empresa</div></div>
+    <div class="step-item" id="step-ind-2"><div class="step-dot">2</div><div class="step-label">Negócio</div></div>
+    <div class="step-item" id="step-ind-3"><div class="step-dot">3</div><div class="step-label">Financeiro</div></div>
+    <div class="step-item" id="step-ind-4"><div class="step-dot">4</div><div class="step-label">Marketing</div></div>
+    <div class="step-item" id="step-ind-5"><div class="step-dot">5</div><div class="step-label">Canal</div></div>
+    <div class="step-item" id="step-ind-6"><div class="step-dot">6</div><div class="step-label">KPIs</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- STEP 1 -->
+  <div class="screen active" id="screen-1">
+    <div class="screen-header">
+      <div class="step-num">Passo 1 de 6</div>
+      <h2>Conte-nos sobre a <em>sua empresa</em></h2>
+      <p>Essas informações vão contextualizar todo o time de diretores de IA para que eles entendam o seu negócio desde o primeiro dia.</p>
+    </div>
+    <div class="field">
+      <label>Nome da empresa *</label>
+      <input type="text" id="f-nome" placeholder="Ex: Livraria Aurora, Tech Solutions...">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>CNPJ (opcional)</label>
+        <input type="text" id="f-cnpj" placeholder="00.000.000/0001-00">
+      </div>
+      <div class="field">
+        <label>Site (opcional)</label>
+        <input type="text" id="f-site" placeholder="www.suaempresa.com.br">
+      </div>
+    </div>
+    <div class="field">
+      <label>Segmento principal *</label>
+      <div class="option-grid cols3">
+        <div class="opt-card" onclick="selectOpt(this,'segmento','varejo')"><div class="opt-icon">🛍️</div><div class="opt-title">Varejo</div><div class="opt-desc">Loja física ou online</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'segmento','servicos')"><div class="opt-icon">🤝</div><div class="opt-title">Serviços</div><div class="opt-desc">Consultoria, agência...</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'segmento','industria')"><div class="opt-icon">🏭</div><div class="opt-title">Indústria</div><div class="opt-desc">Fabricação e produção</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'segmento','digital')"><div class="opt-icon">💻</div><div class="opt-title">Digital / SaaS</div><div class="opt-desc">Produto ou plataforma</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'segmento','saude')"><div class="opt-icon">🏥</div><div class="opt-title">Saúde</div><div class="opt-desc">Clínica, farmácia...</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'segmento','outro')"><div class="opt-icon">✳️</div><div class="opt-title">Outro</div><div class="opt-desc">Agro, educação...</div></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Porte da empresa *</label>
+      <div class="option-grid cols2">
+        <div class="opt-card" onclick="selectOpt(this,'porte','mei')"><div class="opt-title">MEI / Solo</div><div class="opt-desc">Até 1 funcionário</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'porte','pequena')"><div class="opt-title">Pequena</div><div class="opt-desc">2 a 19 funcionários</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'porte','media')"><div class="opt-title">Média</div><div class="opt-desc">20 a 99 funcionários</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'porte','grande')"><div class="opt-title">Grande</div><div class="opt-desc">100+ funcionários</div></div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Cidade</label>
+        <input type="text" id="f-cidade" placeholder="São Paulo">
+      </div>
+      <div class="field">
+        <label>Estado</label>
+        <select id="f-estado">
+          <option value="">Selecione</option>
+          <option>AC</option><option>AL</option><option>AM</option><option>BA</option>
+          <option>CE</option><option>DF</option><option>ES</option><option>GO</option>
+          <option>MA</option><option>MG</option><option>MS</option><option>MT</option>
+          <option>PA</option><option>PB</option><option>PE</option><option>PI</option>
+          <option>PR</option><option>RJ</option><option>RN</option><option>RO</option>
+          <option>RR</option><option>RS</option><option>SC</option><option selected>SP</option>
+          <option>SE</option><option>TO</option>
+        </select>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" disabled>← Voltar</button>
+      <button class="btn-next" onclick="goNext(1)">Continuar <span>→</span><div class="spinner"></div></button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="screen" id="screen-2">
+    <div class="screen-header">
+      <div class="step-num">Passo 2 de 6</div>
+      <h2>Como é o seu <em>negócio</em>?</h2>
+      <p>Entenda o que você vende, para quem e qual é a sua maior dor hoje.</p>
+    </div>
+    <div class="field">
+      <label>O que você vende? *</label>
+      <textarea id="f-produto" placeholder="Descreva seu produto ou serviço principal em 2-3 frases..."></textarea>
+    </div>
+    <div class="field">
+      <label>Seu diferencial competitivo</label>
+      <input type="text" id="f-diferencial" placeholder="Ex: entrega no mesmo dia, preço 30% menor, suporte 24h...">
+    </div>
+    <div class="field">
+      <label>Principal concorrente</label>
+      <input type="text" id="f-concorrente" placeholder="Nome do concorrente ou 'não tenho direto'">
+    </div>
+    <div class="field">
+      <label>Maior dor / desafio atual *</label>
+      <div class="option-grid cols2">
+        <div class="opt-card" onclick="selectOpt(this,'dor','vendas')"><div class="opt-icon">📉</div><div class="opt-title">Vendas baixas</div><div class="opt-desc">Dificuldade em fechar clientes</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'dor','financeiro')"><div class="opt-icon">💸</div><div class="opt-title">Controle financeiro</div><div class="opt-desc">Fluxo de caixa e margens</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'dor','operacoes')"><div class="opt-icon">⚙️</div><div class="opt-title">Operações caóticas</div><div class="opt-desc">Processos sem padrão</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'dor','pessoas')"><div class="opt-icon">👥</div><div class="opt-title">Gestão de equipe</div><div class="opt-desc">Produtividade e cultura</div></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Visão para os próximos 12 meses</label>
+      <input type="text" id="f-visao" placeholder="Ex: dobrar o faturamento, abrir 2ª unidade, lançar app...">
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack(2)">← Voltar</button>
+      <button class="btn-next" onclick="goNext(2)">Continuar <span>→</span><div class="spinner"></div></button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="screen" id="screen-3">
+    <div class="screen-header">
+      <div class="step-num">Passo 3 de 6</div>
+      <h2>Situação <em>financeira</em></h2>
+      <p>Pedro (CFO) vai monitorar a saúde financeira com base nessas informações. Tudo fica seguro e criptografado.</p>
+    </div>
+    <div class="field">
+      <label>Faturamento mensal estimado *</label>
+      <div class="option-grid cols2">
+        <div class="opt-card" onclick="selectOpt(this,'faturamento','ate10k')"><div class="opt-title">Até R$ 10 mil</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'faturamento','10k-50k')"><div class="opt-title">R$ 10k – 50k</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'faturamento','50k-200k')"><div class="opt-title">R$ 50k – 200k</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'faturamento','200k+')"><div class="opt-title">R$ 200k+</div></div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Margem líquida estimada</label>
+        <select id="f-margem">
+          <option value="">Não sei</option>
+          <option>Negativa (prejuízo)</option>
+          <option>0% a 5%</option>
+          <option>5% a 15%</option>
+          <option>15% a 30%</option>
+          <option>Acima de 30%</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Situação do caixa</label>
+        <select id="f-caixa">
+          <option value="">Selecione</option>
+          <option>Positivo e crescendo</option>
+          <option>Positivo e estável</option>
+          <option>Apertado</option>
+          <option>Negativo</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Ferramentas financeiras em uso</label>
+      <input type="text" id="f-ferramentas-fin" placeholder="Ex: Hotmart, Mercado Pago, ContaAzul, planilha...">
+    </div>
+    <div class="field">
+      <label>Meta financeira para 12 meses</label>
+      <input type="text" id="f-meta-fin" placeholder="Ex: faturar R$ 100k/mês, atingir margem de 20%...">
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack(3)">← Voltar</button>
+      <button class="btn-next" onclick="goNext(3)">Continuar <span>→</span><div class="spinner"></div></button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="screen" id="screen-4">
+    <div class="screen-header">
+      <div class="step-num">Passo 4 de 6</div>
+      <h2>Como você <em>vende e cresce</em>?</h2>
+      <p>Mariana (CMO) vai usar essas informações para sugerir estratégias e acompanhar suas campanhas.</p>
+    </div>
+    <div class="field">
+      <label>Canais de venda atuais (selecione todos)</label>
+      <div class="option-grid cols3">
+        <div class="opt-card multi" onclick="toggleMulti(this,'canais','instagram')"><div class="opt-icon">📸</div><div class="opt-title">Instagram</div></div>
+        <div class="opt-card multi" onclick="toggleMulti(this,'canais','whatsapp')"><div class="opt-icon">💬</div><div class="opt-title">WhatsApp</div></div>
+        <div class="opt-card multi" onclick="toggleMulti(this,'canais','site')"><div class="opt-icon">🌐</div><div class="opt-title">Site próprio</div></div>
+        <div class="opt-card multi" onclick="toggleMulti(this,'canais','marketplace')"><div class="opt-icon">🛒</div><div class="opt-title">Marketplace</div></div>
+        <div class="opt-card multi" onclick="toggleMulti(this,'canais','indicacao')"><div class="opt-icon">🤝</div><div class="opt-title">Indicação</div></div>
+        <div class="opt-card multi" onclick="toggleMulti(this,'canais','google')"><div class="opt-icon">🔍</div><div class="opt-title">Google Ads</div></div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Ticket médio</label>
+        <input type="text" id="f-ticket" placeholder="Ex: R$ 150, R$ 2.500...">
+      </div>
+      <div class="field">
+        <label>Budget mensal de marketing</label>
+        <select id="f-budget">
+          <option value="">Não invisto</option>
+          <option>Até R$ 500</option>
+          <option>R$ 500 – 2k</option>
+          <option>R$ 2k – 10k</option>
+          <option>Acima de R$ 10k</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Novos clientes por mês</label>
+      <select id="f-novos-clientes">
+        <option value="">Não sei exato</option>
+        <option>Menos de 5</option>
+        <option>5 a 20</option>
+        <option>20 a 100</option>
+        <option>Mais de 100</option>
+      </select>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack(4)">← Voltar</button>
+      <button class="btn-next" onclick="goNext(4)">Continuar <span>→</span><div class="spinner"></div></button>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="screen" id="screen-5">
+    <div class="screen-header">
+      <div class="step-num">Passo 5 de 6</div>
+      <h2>Como o time vai <em>falar com você</em>?</h2>
+      <p>Escolha como prefere receber relatórios e conversar com sua diretoria de IA.</p>
+    </div>
+    <div class="canal-wrap">
+      <div class="canal-header">Canal principal de comunicação</div>
+      <div class="canal-options">
+        <div class="canal-btn active" id="canal-dash" onclick="selectCanal('dashboard')">
+          <div class="canal-icon">💻</div><div class="canal-name">Dashboard</div><div class="canal-desc">Acesse pelo site</div>
+        </div>
+        <div class="canal-btn" id="canal-wa" onclick="selectCanal('whatsapp')">
+          <div class="canal-icon">📱</div><div class="canal-name">WhatsApp</div><div class="canal-desc">1 empresa</div>
+        </div>
+        <div class="canal-btn" id="canal-tg" onclick="selectCanal('telegram')">
+          <div class="canal-icon">✈️</div><div class="canal-name">Telegram</div><div class="canal-desc">Múltiplas empresas</div>
+        </div>
+      </div>
+      <div class="canal-input-wrap" id="canal-wa-input">
+        <div class="field">
+          <label>Seu número WhatsApp (com DDI)</label>
+          <input type="tel" id="f-wa-num" placeholder="+55 11 99999-9999">
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px">O Lucas (CEO) vai te mandar uma mensagem de boas-vindas ao ativar.</p>
+      </div>
+      <div class="canal-input-wrap" id="canal-tg-input">
+        <p style="font-size:13px;color:var(--muted);padding:0 0 12px">Após finalizar, você receberá o link do bot do Telegram para adicionar no seu app.</p>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:16px;background:rgba(201,168,76,0.06);border:1px solid var(--border);border-radius:10px;">
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px">
+        🔔 <strong style="color:var(--white)">Alertas diários via WhatsApp</strong> — configure para receber o fechamento executivo do Lucas todo dia.
+      </p>
+      <div class="field" style="margin-bottom:0">
+        <label>WhatsApp para alertas (opcional)</label>
+        <input type="tel" id="f-wa-alertas" placeholder="+55 11 99999-9999">
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack(5)">← Voltar</button>
+      <button class="btn-next" onclick="goNext(5)">Continuar <span>→</span><div class="spinner"></div></button>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="screen" id="screen-6">
+    <div class="screen-header">
+      <div class="step-num">Passo 6 de 6</div>
+      <h2>O que vamos <em>monitorar</em>?</h2>
+      <p>Selecione os 3 KPIs prioritários. O time vai acompanhá-los diariamente e alertar quando algo sair do esperado.</p>
+    </div>
+    <div class="field">
+      <label>KPI Financeiro *</label>
+      <div class="option-grid cols2">
+        <div class="opt-card" onclick="selectOpt(this,'kpi-fin','faturamento_mensal')"><div class="opt-title">Faturamento mensal</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-fin','margem_liquida')"><div class="opt-title">Margem líquida</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-fin','fluxo_caixa')"><div class="opt-title">Fluxo de caixa</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-fin','inadimplencia')"><div class="opt-title">Inadimplência</div></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>KPI de Marketing / Vendas *</label>
+      <div class="option-grid cols2">
+        <div class="opt-card" onclick="selectOpt(this,'kpi-mkt','novos_clientes')"><div class="opt-title">Novos clientes/mês</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-mkt','taxa_conversao')"><div class="opt-title">Taxa de conversão</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-mkt','cac')"><div class="opt-title">CAC</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-mkt','roas')"><div class="opt-title">ROAS campanhas</div></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>KPI Operacional *</label>
+      <div class="option-grid cols2">
+        <div class="opt-card" onclick="selectOpt(this,'kpi-ops','nps')"><div class="opt-title">NPS / satisfação</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-ops','prazo_entrega')"><div class="opt-title">Prazo de entrega</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-ops','produtividade')"><div class="opt-title">Produtividade</div></div>
+        <div class="opt-card" onclick="selectOpt(this,'kpi-ops','recompra')"><div class="opt-title">Taxa de recompra</div></div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goBack(6)">← Voltar</button>
+      <button class="btn-next" id="btn-finalizar" onclick="finalizar()">
+        <span>🚀 Ativar minha Diretoria</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="screen-success">
+    <div class="success-icon">🚀</div>
+    <h2>Sua diretoria está <em>ativa</em>!</h2>
+    <p>10 diretores de IA já conhecem a sua empresa e estão prontos para trabalhar. O Lucas vai te mandar uma mensagem de boas-vindas em breve.</p>
+    <div class="agents-grid">
+      <div class="agent-badge" style="animation-delay:0.1s"><div class="dot"></div>Lucas · CEO</div>
+      <div class="agent-badge" style="animation-delay:0.2s"><div class="dot"></div>Mariana · CMO</div>
+      <div class="agent-badge" style="animation-delay:0.3s"><div class="dot"></div>Pedro · CFO</div>
+      <div class="agent-badge" style="animation-delay:0.4s"><div class="dot"></div>Carla · COO</div>
+      <div class="agent-badge" style="animation-delay:0.5s"><div class="dot"></div>Rafael · CPO</div>
+      <div class="agent-badge" style="animation-delay:0.6s"><div class="dot"></div>Ana · CHRO</div>
+      <div class="agent-badge" style="animation-delay:0.7s"><div class="dot"></div>Dani · Dados</div>
+      <div class="agent-badge" style="animation-delay:0.8s"><div class="dot"></div>Zé · Coach</div>
+      <div class="agent-badge" style="animation-delay:0.9s"><div class="dot"></div>Beto · Otimizador</div>
+      <div class="agent-badge" style="animation-delay:1.0s"><div class="dot"></div>Diana · CNO</div>
+    </div>
+    <button class="btn-dashboard" onclick="window.location.href='/dashboard'">Ir para o Dashboard →</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = { segmento:null, porte:null, dor:null, faturamento:null, canais:[], canal_principal:'dashboard', 'kpi-fin':null, 'kpi-mkt':null, 'kpi-ops':null };
+let currentStep = 1;
+
+window.addEventListener('DOMContentLoaded', () => {
+  const c = JSON.parse(localStorage.getItem('it_conta') || '{}');
+  document.getElementById('nome-usuario').textContent = c.nome ? c.nome.split(' ')[0] : 'Usuário';
+  // If no token, redirect to login
+  if (!localStorage.getItem('it_token')) window.location.href = '/login';
+});
+
+function selectOpt(el, group, value) {
+  el.closest('.option-grid').querySelectorAll('.opt-card:not(.multi)').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  DATA[group] = value;
+}
+
+function toggleMulti(el, group, value) {
+  el.classList.toggle('selected');
+  DATA[group] = el.classList.contains('selected')
+    ? [...DATA[group], value]
+    : DATA[group].filter(v => v !== value);
+}
+
+function selectCanal(canal) {
+  document.getElementById('canal-dash').classList.toggle('active', canal === 'dashboard');
+  document.getElementById('canal-wa').classList.toggle('active', canal === 'whatsapp');
+  document.getElementById('canal-tg').classList.toggle('active', canal === 'telegram');
+  document.getElementById('canal-wa-input').classList.toggle('show', canal === 'whatsapp');
+  document.getElementById('canal-tg-input').classList.toggle('show', canal === 'telegram');
+  DATA.canal_principal = canal;
+}
+
+function showStep(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + n).classList.add('active');
+  for (let i = 1; i <= 6; i++) {
+    const ind = document.getElementById('step-ind-' + i);
+    const dot = ind.querySelector('.step-dot');
+    ind.className = 'step-item' + (i < n ? ' done' : i === n ? ' active' : '');
+    dot.textContent = i < n ? '✓' : i;
+  }
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNext(step) {
+  if (!validateStep(step)) return;
+  if (step < 6) showStep(step + 1);
+}
+
+function goBack(step) { if (step > 1) showStep(step - 1); }
+
+function validateStep(step) {
+  if (step === 1) {
+    if (!document.getElementById('f-nome').value.trim()) { toast('Digite o nome da empresa'); return false; }
+    if (!DATA.segmento) { toast('Selecione o segmento'); return false; }
+    if (!DATA.porte) { toast('Selecione o porte da empresa'); return false; }
+  }
+  if (step === 2) {
+    if (!document.getElementById('f-produto').value.trim()) { toast('Descreva o que você vende'); return false; }
+    if (!DATA.dor) { toast('Selecione o principal desafio'); return false; }
+  }
+  if (step === 3) {
+    if (!DATA.faturamento) { toast('Informe o faturamento estimado'); return false; }
+  }
+  if (step === 6) {
+    if (!DATA['kpi-fin']) { toast('Selecione o KPI financeiro'); return false; }
+    if (!DATA['kpi-mkt']) { toast('Selecione o KPI de marketing'); return false; }
+    if (!DATA['kpi-ops']) { toast('Selecione o KPI operacional'); return false; }
+  }
+  return true;
+}
+
+async function finalizar() {
+  if (!validateStep(6)) return;
+  const btn = document.getElementById('btn-finalizar');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  const payload = {
+    empresa: { nome: document.getElementById('f-nome').value.trim(), cnpj: document.getElementById('f-cnpj').value.trim(), site: document.getElementById('f-site').value.trim(), segmento: DATA.segmento, porte: DATA.porte, cidade: document.getElementById('f-cidade').value.trim(), estado: document.getElementById('f-estado').value },
+    negocio: { produto: document.getElementById('f-produto').value.trim(), diferencial: document.getElementById('f-diferencial').value.trim(), concorrente: document.getElementById('f-concorrente').value.trim(), dor: DATA.dor, visao: document.getElementById('f-visao').value.trim() },
+    financeiro: { faturamento: DATA.faturamento, margem: document.getElementById('f-margem').value, caixa: document.getElementById('f-caixa').value, ferramentas: document.getElementById('f-ferramentas-fin').value.trim(), meta: document.getElementById('f-meta-fin').value.trim() },
+    marketing: { canais: DATA.canais, ticket: document.getElementById('f-ticket').value.trim(), budget: document.getElementById('f-budget').value, novos_clientes: document.getElementById('f-novos-clientes').value },
+    canal: { principal: DATA.canal_principal, whatsapp: document.getElementById('f-wa-num').value.trim(), alertas: document.getElementById('f-wa-alertas').value.trim() },
+    kpis: { financeiro: DATA['kpi-fin'], marketing: DATA['kpi-mkt'], operacional: DATA['kpi-ops'] }
+  };
+
+  try {
+    const res = await fetch('/api/onboarding/salvar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('it_token')}` },
+      body: JSON.stringify(payload)
+    });
+    const ok = res.ok;
+    if (!ok) { const d = await res.json().catch(()=>({})); toast(d.detalhe || 'Erro ao salvar. Tente novamente.'); btn.classList.remove('loading'); btn.disabled = false; return; }
+  } catch(e) { /* dev mode: continue */ }
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-success').classList.add('active');
+  for (let i = 1; i <= 6; i++) {
+    const ind = document.getElementById('step-ind-' + i);
+    ind.className = 'step-item done';
+    ind.querySelector('.step-dot').textContent = '✓';
+  }
+}
+
+function toast(msg, type='error') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'ok' ? ' ok' : '');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
